@@ -5,8 +5,10 @@ from __future__ import annotations
 
 import os
 import sys
-import instaloader 
+
+import instaloader
 from dotenv import load_dotenv
+
 
 HASHTAG = "gym"
 
@@ -39,24 +41,20 @@ def walk_dicts(value):
         yield value #Understand it better yield TODO
         for child in value.values():
             yield from walk_dicts(child)
-
     elif isinstance(value, list):
         for item in value:
             yield from walk_dicts(item)
 
 def fetch_video_link() -> str:
     loader = build_loader()
-
     hashtag = instaloader.Hashtag.from_name(loader.context, HASHTAG)
 
-    # Do NOT use hashtag.get_posts(); it causes the more_available error.
-    raw_data = getattr(hashtag, "_node", {})
-
+    # get_posts() currently fails for some hashtags with KeyError: more_available.
+    raw_data = getattr(hashtag, "_node", {}) or {}
     seen_shortcodes = set()
 
     for item in walk_dicts(raw_data):
         shortcode = item.get("shortcode") or item.get("code")
-
         is_video = (
             item.get("is_video") is True
             or item.get("media_type") == 2
@@ -69,16 +67,6 @@ def fetch_video_link() -> str:
 
     raise RuntimeError("No #gym video link was found in Instagram's returned data.")
 
-# def fetch_video_link() -> str:
-#     loader = build_loader()
-#     hashtag = instaloader.Hashtag.from_name(loader.context, HASHTAG)
-
-#     for post in hashtag.get_posts():
-#         if post.is_video:
-#             #post.shortcode is instagram unique ID for a link
-#             return f"https://www.instagram.com/p/{post.shortcode}/"
-        
-#     raise RuntimeError("No videos for #gym")
 
 def main() -> None:
     try:
@@ -89,6 +77,3 @@ def main() -> None:
 
 if __name__ == "__main__": #TODO remove this once TUI is setup
     main()
-
-
-

@@ -7,7 +7,7 @@ Script
 
 
 TUI 
-1. Program run -> Welcome screen -> Hello World
+1. ~~Program run -> Welcome screen -> Hello World~~
 2. Welcome screen with options + Enter Button
 3. Second screen with table
 4. Link first screen to second screen.
